@@ -1,394 +1,135 @@
-# Desafio Full-stack Júnior — Sistema de Gestão de Tarefas Colaborativo
+# Turborepo starter
 
-Bem‑vindo(a)! Este é um **teste prático** para a vaga de **Full‑stack Developer Júnior** na **Jungle Gaming**. O objetivo é avaliar sua capacidade de estruturar um monorepo, modelar um domínio simples, construir uma UI funcional e integrar serviços usando mensageria.
+This Turborepo starter is maintained by the Turborepo core team.
 
-> **Stack Obrigatória**
->
-> * **Front‑end:** React.js + **TanStack Router**, **shadcn/ui**, **Tailwind CSS**
-> * **Back‑end:** **Nest.js**, **TypeORM**, **RabbitMQ** (microservices Nest)
-> * **Infra/DevX:** **Docker & docker‑compose**, **Monorepo com Turborepo**
+## Using this example
 
----
+Run the following command:
 
-## 🎯 Contexto & Objetivo
-
-Construir um **Sistema de Gestão de Tarefas Colaborativo** com autenticação simples, CRUD de tarefas, comentários, atribuição e notificações. O sistema deve rodar em **monorepo** e expor uma **UI** limpa, responsiva e usável. O back‑end deve ser composto por **microserviços Nest** que se comunicam via **RabbitMQ**; o acesso HTTP externo passa por um **API Gateway** (Nest HTTP).
-
-**O que queremos observar:**
-
-* Organização, clareza e pragmatismo.
-* Segurança básica (hash de senha, validação de entrada).
-* Divisão de responsabilidades entre serviços.
-* Qualidade da UI e DX (developer experience).
-
----
-
-## 🧱 Requisitos Funcionais
-
-### Autenticação & Gateway
-
-* **JWT** com **cadastro/login** (email, username, password) e **proteção de rotas no API Gateway**.
-* **Hash de senha** com **bcrypt** (ou argon2).
-* **Tokens:** `accessToken` (15 min) e `refreshToken` (7 dias) + **endpoint de refresh**.
-* **Swagger/OpenAPI** exposto no Gateway.
-
-### Tarefas (inclui comentários e histórico)
-
-* **CRUD completo** com campos: **título**, **descrição**, **prazo**, **prioridade** (`LOW`, `MEDIUM`, `HIGH`, `URGENT`) e **status** (`TODO`, `IN_PROGRESS`, `REVIEW`, `DONE`).
-* **Atribuição a múltiplos usuários**.
-* **Comentários**: criar e listar em cada tarefa.
-* **Histórico de alterações** (audit log simplificado).
-
-### Notificações & Tempo Real
-
-* Ao **criar/atualizar/comentar** uma tarefa, **publicar evento** no broker (**RabbitMQ**).
-* Serviço de **notifications** consome da fila, **persiste** e **entrega via WebSocket**.
-* WebSocket notifica quando:
-
-  * a tarefa é **atribuída** ao usuário;
-  * o **status** da tarefa muda;
-  * há **novo comentário** em tarefa da qual participa.
-
-### Docker
-
-* **Obrigatório subir tudo com Docker Compose** (serviços do app, broker, dbs, etc.).
-
-
-## ⚡ HTTP Endpoints & WebSocket Events
-
-### HTTP (Gateway)
-
-```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/refresh
-
-GET    /api/tasks?page=&size=               # lista de tarefas com paginação
-POST   /api/tasks                           # cria e publica `task.created`
-GET    /api/tasks/:id
-PUT    /api/tasks/:id                       # atualiza e publica `task.updated`
-DELETE /api/tasks/:id
-
-POST   /api/tasks/:id/comments              # publica `task.comment.created`
-GET    /api/tasks/:id/comments?page=&size   # lista de comentários com paginação
+```sh
+npx create-turbo@latest
 ```
 
-### WebSocket Events
+## What's inside?
 
-* `task:created` – tarefa foi criada
-* `task:updated` – tarefa foi atualizada
-* `comment:new` – novo comentário
+This Turborepo includes the following packages/apps:
 
----
+### Apps and Packages
 
-## 🏗️ Estrutura do Monorepo (sugerida)
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Utilities
+
+This Turborepo has some additional tools already setup for you:
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
+
+### Build
+
+To build all apps and packages, run the following command:
 
 ```
-.
-├── apps/
-│   ├── web/                     
-│   │   ├── src/                  # React + TanStack Router + shadcn + Tailwind
-│   │   ├── Dockerfile   
-│   │   ├── .env.example          # variáveis de ambiente do frontend
-│   │   ├── package.json              
-│   ├── api-gateway/   
-│   │   ├── src/                  # HTTP + WebSocket + Swagger
-│   │   ├── Dockerfile
-│   │   ├── .env.example          # variáveis do API Gateway (Nest.js)
-│   │   ├── package.json
-│   ├── auth-service/            
-│   │   ├── src/                  # Nest.js (microserviço de autenticação)
-│   │   ├── migrations/
-│   │   ├── Dockerfile
-│   │   ├── .env.example          # variáveis do serviço de autenticação
-│   │   ├── package.json
-│   ├── tasks-service/   
-│   │   ├── src/                  # Nest.js (microserviço RabbitMQ)
-│   │   ├── migrations/
-│   │   ├── Dockerfile        
-│   │   ├── .env.example          # variáveis do serviço de tarefas
-│   │   ├── package.json
-│   └── notifications-service/   
-│       ├── src/                  # Nest.js (microserviço RabbitMQ + WebSocket)
-│       ├── migrations/
-│       ├── Dockerfile
-│       ├── .env.example          # variáveis do serviço de notificações
-│       ├── package.json                
-├── packages/
-│   ├── types/                   
-│   ├── utils/                   
-│   ├── eslint-config/           
-│   └── tsconfig/                
-├── docker-compose.yml
-├── turbo.json
-├── package.json
-└── README.md
+cd my-turborepo
+
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo build
+
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo build
+yarn dlx turbo build
+pnpm exec turbo build
 ```
 
----
+You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
 
-## 🧭 Front-end (exigências)
+```
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo build --filter=docs
 
-* **React.js** com **TanStack Router**.
-* **UI:** mínimo 5 componentes com **shadcn/ui** + **Tailwind CSS**.
-* **Páginas obrigatórias:**
-  * Login/Register com validação (Pode ser um modal)
-  * Lista de tarefas com filtros e busca
-  * Detalhe da tarefa com comentários
-* **Estado:** Context API ou Zustand para auth.
-* **WebSocket:** conexão para notificações em tempo real.
-* **Validação:** `react-hook-form` + `zod`.
-* **Loading/Error:** Skeleton loaders (shimmer effect) e toast notifications.
-
-> **Diferencial:** TanStack Query.
-
----
-
-## 🛠️ Back-end (exigências)
-
-* **Nest.js** com **TypeORM** (PostgreSQL).
-* **JWT** com Guards e estratégias Passport.
-* **Swagger** completo no Gateway (`/api/docs`).
-* **DTOs** com `class-validator` e `class-transformer`.
-* **Microserviços** Nest.js com **RabbitMQ**.
-* **WebSocket** Gateway para eventos real-time.
-* **Migrations** com TypeORM.
-* **Rate limiting** no API Gateway (10 req/seg).
-
-> **Diferencial:** health checks, Logging com Winston ou Pino, testes unitários.
-
----
-
-## 🐳 Docker & Compose (sugerido)
-
-```yaml
-version: '3.8'
-
-services:
-  # Frontend React Application
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-      target: development
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=development
-    networks:
-      - challenge-network
-    command: npm run dev -- --host 0.0.0.0
-
-  # API Gateway
-  api-gateway:
-    container_name: api-gateway
-    build:
-      context: .
-      dockerfile: ./apps/api-gateway/Dockerfile
-      target: development
-    ports:
-      - '3001:3001'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/api-gateway/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Auth Service
-  auth-service:
-    container_name: auth-service
-    build:
-      context: .
-      dockerfile: ./apps/auth-service/Dockerfile
-      target: development
-    ports:
-      - '3002:3002'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/auth-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Tasks Service
-  tasks-service:
-    container_name: tasks-service
-    build:
-      context: .
-      dockerfile: ./apps/tasks-service/Dockerfile
-      target: development
-    ports:
-      - '3003:3003'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/tasks-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3003
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Notifications Service
-  notifications-service:
-    container_name: notifications-service
-    build:
-      context: .
-      dockerfile: ./apps/notifications-service/Dockerfile
-      target: development
-    ports:
-      - '3004:3004'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/notifications-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3004
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Postgres Database
-  db:
-    image: postgres:17.5-alpine3.21
-    container_name: db
-    attach: false
-    ports:
-      - '5432:5432'
-    networks:
-      - challenge-network
-    restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_DB: challenge_db
-
-  # RabbitMQ
-  rabbitmq:
-    image: rabbitmq:3.13-management-alpine
-    container_name: rabbitmq
-    attach: false
-    restart: always
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    networks:
-      - challenge-network
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-    volumes: ['rabbitmq_data:/var/lib/rabbitmq']
-
-volumes:
-  postgres_data:
-    driver: local
-  rabbitmq_data:
-    driver: local
-
-networks:
-  challenge-network:
-    driver: bridge
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo build --filter=docs
+yarn exec turbo build --filter=docs
+pnpm exec turbo build --filter=docs
 ```
 
----
+### Develop
 
-## 📝 Documentação Esperada
+To develop all apps and packages, run the following command:
 
-No seu README, inclua:
+```
+cd my-turborepo
 
-1. **Arquitetura** (diagrama simples ASCII ou imagem)
-2. **Decisões técnicas** e trade-offs
-3. **Problemas conhecidos** e o que melhoraria
-4. **Tempo gasto** em cada parte
-5. **Instruções específicas** se houver
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo dev
 
----
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo dev
+yarn exec turbo dev
+pnpm exec turbo dev
+```
 
-## 📚 Material de Referência
+You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
 
-Para auxiliar no desenvolvimento deste desafio, disponibilizamos alguns conteúdos que podem ser úteis:
+```
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo dev --filter=web
 
-### Vídeos Recomendados
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo dev --filter=web
+yarn exec turbo dev --filter=web
+pnpm exec turbo dev --filter=web
+```
 
-* **[Autenticação centralizada em microsserviços NestJS](https://www.youtube.com/watch?v=iiSTB0btEgA)** - Como implementar autenticação centralizada em uma arquitetura de microsserviços usando NestJS.
-* **[Tutorial de Microservices com Nest.js em 20 Minutos](https://www.youtube.com/watch?v=C250DCwS81Q)** - Passo a passo rápido para criar e conectar microsserviços no NestJS.
+### Remote Caching
 
-Estes materiais são sugestões para apoiar seu desenvolvimento, mas sinta-se livre para buscar outras referências que julgar necessárias.
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
----
+Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
 
-## ❓ FAQ
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
 
-**Posso usar NextJS ao invés de React puro?**
-Não. React com TanStack Router é obrigatório.
+```
+cd my-turborepo
 
-**Preciso implementar reset de senha?**
-Não é obrigatório, mas seria um diferencial.
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo login
 
-**WebSocket é obrigatório?**
-Sim, para notificações em tempo real.
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo login
+yarn exec turbo login
+pnpm exec turbo login
+```
 
-**Posso usar Prisma ou MikroORM ao invés de TypeORM?**
-Não. TypeORM é requisito obrigatório.
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
----
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
-## 📧 Suporte e Dúvidas
+```
+# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+turbo link
 
-Caso tenha alguma dúvida sobre o teste ou precise de esclarecimentos:
+# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
+npx turbo link
+yarn exec turbo link
+pnpm exec turbo link
+```
 
-* Entre em contato com o **recrutador que enviou este teste**
-* Ou envie um e-mail para: **recruitment@junglegaming.io**
+## Useful Links
 
-Responderemos o mais breve possível para garantir que você tenha todas as informações necessárias para realizar o desafio.
+Learn more about the power of Turborepo:
 
----
-
-## 🕒 Prazo
-
-* **Entrega:** 14 dias corridos a partir do recebimento
-
----
-
-## 💡 Dicas Finais
-
-* **Comece pelo básico:** Auth → CRUD → RabbitMQ → WebSocket.
-* **Logs claros:** Facilita debug do fluxo assíncrono.
-
----
-
-**Boa sorte!** 🚀
+- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
+- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
+- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
+- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
+- [Configuration Options](https://turborepo.com/docs/reference/configuration)
+- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
