@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "../../packages/typescript-config/base.json",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
@@ -9,8 +9,16 @@
     "module": "commonjs",
     "moduleResolution": "Node10",
     "outDir": "dist",
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "target": "ES2015"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "**/*spec.ts"
+  ]
 }
