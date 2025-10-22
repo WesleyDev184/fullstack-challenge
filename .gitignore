@@ -26,7 +26,12 @@ coverage
 out/
 build
 dist
+dist-ssr
 
+*.local
+.nitro
+.tanstack
+.wrangler
 
 # Debug
 npm-debug.log*
@@ -36,3 +41,4 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+.DS_Store
