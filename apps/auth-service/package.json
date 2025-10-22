@@ -12,14 +12,21 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:run": "pnpm typeorm -- migration:run --dataSource src/shared/database/migration.config.ts",
+    "migration:revert": "pnpm typeorm -- migration:revert --dataSource src/shared/database/migration.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "pg": "^8.16.3",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
