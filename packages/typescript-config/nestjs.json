@@ -29,7 +29,6 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "incremental": true
   }
 }
