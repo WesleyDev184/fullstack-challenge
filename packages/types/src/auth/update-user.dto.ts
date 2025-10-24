@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
@@ -9,7 +8,7 @@ import {
 
 export class UpdateUserDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID()
   id: string;
 

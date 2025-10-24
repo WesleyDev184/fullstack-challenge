@@ -2,10 +2,28 @@ import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import 'dotenv/config'
 
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { apiReference } from '@scalar/nestjs-api-reference'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  const config = new DocumentBuilder()
+    .setTitle('Fullstack Challenge API')
+    .setDescription('The Fullstack Challenge API description')
+    .setVersion('1.0')
+    .build()
+  const documentFactory = () => SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('openapi', app, documentFactory)
+  app.use(
+    '/docs',
+    apiReference({
+      content: documentFactory,
+      theme: 'deepSpace',
+    }),
+  )
+
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
   app.setGlobalPrefix('api')
