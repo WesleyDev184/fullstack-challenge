@@ -1,7 +1,13 @@
 import { User } from '@/shared/database/entities/user.entity'
-import { HttpException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { CreateUserDto, UpdateUserDto } from '@repo/types'
+import {
+  CreateUserDto,
+  HttpError,
+  ResponseUserDto,
+  ResponseUserListDto,
+  UpdateUserDto,
+} from '@repo/types'
 import * as bcrypt from 'bcryptjs'
 import { EntityManager, Repository } from 'typeorm'
 
@@ -13,13 +19,15 @@ export class UsersService {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<ResponseUserDto | HttpError> {
     const { username, email, password } = createUserDto
 
     const existingUser = await this.findByEmail(email)
 
     if (existingUser) {
-      return new HttpException('Email already in use', 400)
+      return new HttpError('Email already in use', 400)
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -30,18 +38,54 @@ export class UsersService {
       password: hashedPassword,
     })
 
-    return await this.entityManager.save(user)
+    const res = await this.entityManager.save(user)
+
+    return new ResponseUserDto(
+      res.id,
+      res.email,
+      res.username,
+      res.createdAt,
+      res.updatedAt,
+    )
   }
 
-  async findAll() {
-    return await this.usersRepository.find()
+  async findAll(): Promise<ResponseUserListDto> {
+    const [users, count] = await this.usersRepository.findAndCount()
+    return new ResponseUserListDto(
+      count,
+      users.map(
+        user =>
+          new ResponseUserDto(
+            user.id,
+            user.email,
+            user.username,
+            user.createdAt,
+            user.updatedAt,
+          ),
+      ),
+    )
   }
 
-  async findOne(id: string) {
-    return await this.usersRepository.findOneBy({ id })
+  async findOne(id: string): Promise<ResponseUserDto | HttpError> {
+    const user = await this.usersRepository.findOneBy({ id })
+
+    if (!user) {
+      return new HttpError('User not found', 404)
+    }
+
+    return new ResponseUserDto(
+      user.id,
+      user.email,
+      user.username,
+      user.createdAt,
+      user.updatedAt,
+    )
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<ResponseUserDto | HttpError> {
     let res: User | undefined
 
     await this.entityManager.transaction(async entityManager => {
@@ -55,23 +99,29 @@ export class UsersService {
     })
 
     if (!res) {
-      return new HttpException('User not found', 404)
+      return new HttpError('User not found', 404)
     }
 
-    return res
+    return new ResponseUserDto(
+      res.id,
+      res.email,
+      res.username,
+      res.createdAt,
+      res.updatedAt,
+    )
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<{ message: string } | HttpError> {
     const res = await this.usersRepository.delete(id)
 
     if (res.affected === 0) {
-      return new HttpException('User not found', 404)
+      return new HttpError('User not found', 404)
     }
 
     return { message: `User ${id} deleted successfully` }
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User | null> {
     return await this.usersRepository.findOneBy({ email })
   }
 }

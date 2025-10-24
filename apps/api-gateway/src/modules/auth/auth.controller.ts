@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Inject,
   Param,
   Post,
@@ -24,12 +25,20 @@ export class AuthController {
     const result = await lastValueFrom(
       this.authService.send('create-user', body),
     )
+
+    if (result.status && result.message) {
+      throw new HttpException(result.message, result.status)
+    }
+
     return result
   }
 
   @Post('login')
   async login(@Body() body: LoginDto) {
     const result = await lastValueFrom(this.authService.send('login', body))
+    if (result.status && result.message) {
+      throw new HttpException(result.message, result.status)
+    }
     return result
   }
 
@@ -39,6 +48,9 @@ export class AuthController {
     const result = await lastValueFrom(
       this.authService.send('find-all-users', {}),
     )
+    if (result.status && result.message) {
+      throw new HttpException(result.message, result.status)
+    }
     return result
   }
 
@@ -48,6 +60,9 @@ export class AuthController {
     const result = await lastValueFrom(
       this.authService.send('find-user-by-id', id),
     )
+    if (result.status && result.message) {
+      throw new HttpException(result.message, result.status)
+    }
     return result
   }
 }
