@@ -10,7 +10,7 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   @IsUUID()
-  id: string;
+  id?: string;
 
   @IsOptional()
   @IsString()
@@ -27,7 +27,7 @@ export class UpdateUserDto {
   password?: string;
 
   constructor(
-    id: string,
+    id?: string,
     username?: string,
     email?: string,
     password?: string

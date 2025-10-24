@@ -380,6 +380,9 @@ importers:
       '@repo/consts':
         specifier: workspace:*
         version: link:../../packages/consts
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       amqp-connection-manager:
         specifier: ^5.0.0
         version: 5.0.0(amqplib@0.10.9)

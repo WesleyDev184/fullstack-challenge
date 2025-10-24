@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { TaskPriorityEnum } from '../enums/task-priority.enum'
-import { TaskStatusEnum } from '../enums/task-status.enum'
+
+import { TaskPriorityEnum, TaskStatusEnum } from '@repo/types'
 import { TaskAssignee } from './task-assignee.entity'
 import { TaskComment } from './task-comment.entity'
 import { TaskHistory } from './task-history.entity'
