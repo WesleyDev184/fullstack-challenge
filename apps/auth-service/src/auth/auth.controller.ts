@@ -12,12 +12,12 @@ export class AuthController {
     return await this.authService.login(loginDto)
   }
 
-  @MessagePattern('validateToken')
+  @MessagePattern('validate-token')
   async validateToken(@Payload() token: string) {
     return await this.authService.validateToken(token)
   }
 
-  @MessagePattern('refreshToken')
+  @MessagePattern('refresh-token')
   async refreshToken(@Payload() token: string) {
     return await this.authService.refreshToken(token)
   }

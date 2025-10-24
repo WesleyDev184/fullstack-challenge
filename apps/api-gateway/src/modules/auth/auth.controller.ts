@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common'
+import { AuthGuard } from '@/guards/auth/auth.guard'
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { AUTH_SERVICE_NAME } from '@repo/consts'
 import { CreateUserDto, LoginDto } from '@repo/types'
@@ -13,7 +22,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() body: CreateUserDto) {
     const result = await lastValueFrom(
-      this.authService.send('createUser', body),
+      this.authService.send('create-user', body),
     )
     return result
   }
@@ -25,17 +34,19 @@ export class AuthController {
   }
 
   @Get('users')
+  @UseGuards(AuthGuard)
   async getAllUsers() {
     const result = await lastValueFrom(
-      this.authService.send('findAllUsers', {}),
+      this.authService.send('find-all-users', {}),
     )
     return result
   }
 
   @Get('users/:id')
+  @UseGuards(AuthGuard)
   async getUserById(@Param('id') id: string) {
     const result = await lastValueFrom(
-      this.authService.send('findUserById', id),
+      this.authService.send('find-user-by-id', id),
     )
     return result
   }

@@ -7,27 +7,27 @@ import { UsersService } from './users.service'
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @MessagePattern('createUser')
+  @MessagePattern('create-user')
   async create(@Payload() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto)
   }
 
-  @MessagePattern('findAllUsers')
+  @MessagePattern('find-all-users')
   async findAll() {
     return await this.usersService.findAll()
   }
 
-  @MessagePattern('findUserById')
+  @MessagePattern('find-user-by-id')
   async findOne(@Payload() id: string) {
     return await this.usersService.findOne(id)
   }
 
-  @MessagePattern('updateUser')
+  @MessagePattern('update-user')
   async update(@Payload() updateUserDto: UpdateUserDto) {
     return await this.usersService.update(updateUserDto.id, updateUserDto)
   }
 
-  @MessagePattern('removeUser')
+  @MessagePattern('remove-user')
   async remove(@Payload() id: string) {
     return await this.usersService.remove(id)
   }

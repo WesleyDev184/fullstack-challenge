@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm'
 export class UserTable1761181115844 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+      CREATE OR REPLACE FUNCTION func_set_timestamp()
       RETURNS TRIGGER AS $$
       BEGIN
         NEW.updated_at = NOW();
@@ -32,7 +32,7 @@ export class UserTable1761181115844 implements MigrationInterface {
       CREATE TRIGGER "set_timestamp_user"
       BEFORE UPDATE ON "user"
       FOR EACH ROW
-      EXECUTE PROCEDURE trigger_set_timestamp();
+      EXECUTE PROCEDURE func_set_timestamp();
     `)
   }
 

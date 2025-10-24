@@ -20,7 +20,7 @@ export class User {
   @Column('varchar')
   email: string
 
-  @Column('varchar', { nullable: true, select: false })
+  @Column('varchar', { nullable: true })
   password?: string
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
