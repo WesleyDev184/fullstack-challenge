@@ -24,10 +24,16 @@ export class UsersService {
   ): Promise<ResponseUserDto | HttpError> {
     const { username, email, password } = createUserDto
 
-    const existingUser = await this.findByEmail(email)
-
-    if (existingUser) {
+    const existingUserByEmail = await this.findByEmail(email)
+    if (existingUserByEmail) {
       return new HttpError('Email already in use', 400)
+    }
+
+    const existingUserByUsername = await this.usersRepository.findOneBy({
+      username,
+    })
+    if (existingUserByUsername) {
+      return new HttpError('Username already in use', 400)
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -88,15 +94,55 @@ export class UsersService {
   ): Promise<ResponseUserDto | HttpError> {
     let res: User | undefined
 
-    await this.entityManager.transaction(async entityManager => {
-      const user = await this.usersRepository.findOneBy({ id })
+    await this.entityManager
+      .transaction(async entityManager => {
+        const user = await this.usersRepository.findOneBy({ id })
 
-      if (user) {
+        if (!user) {
+          throw new Error('User not found')
+        }
+
+        if (updateUserDto.email && updateUserDto.email !== user.email) {
+          const existingUserByEmail = await this.findByEmail(
+            updateUserDto.email,
+          )
+          if (existingUserByEmail) {
+            throw new Error('Email already in use')
+          }
+        }
+
+        if (
+          updateUserDto.username &&
+          updateUserDto.username !== user.username
+        ) {
+          const existingUserByUsername = await this.usersRepository.findOneBy({
+            username: updateUserDto.username,
+          })
+          if (existingUserByUsername) {
+            throw new Error('Username already in use')
+          }
+        }
+
+        // Hash da senha se fornecida
+        if (updateUserDto.password) {
+          updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
+        }
+
         res = Object.assign(user, updateUserDto)
-
         await entityManager.save(user)
-      }
-    })
+      })
+      .catch(error => {
+        if (error.message === 'User not found') {
+          return new HttpError('User not found', 404)
+        }
+        if (
+          error.message === 'Email already in use' ||
+          error.message === 'Username already in use'
+        ) {
+          return new HttpError(error.message, 400)
+        }
+        throw error // Re-throw outros erros
+      })
 
     if (!res) {
       return new HttpError('User not found', 404)
