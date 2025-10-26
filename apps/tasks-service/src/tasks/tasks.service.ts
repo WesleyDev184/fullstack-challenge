@@ -1,19 +1,12 @@
-import { TaskComment } from '@/shared/database/entities/task-comment.entity'
 import { Task } from '@/shared/database/entities/task.entity'
 import { HttpException, Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AUTH_SERVICE_NAME, NOTIFICATIONS_SERVICE_NAME } from '@repo/consts'
-import {
-  CreateTaskCommentDto,
-  CreateTaskDto,
-  PaginatedResponseDto,
-  UpdateTaskDto,
-} from '@repo/types'
+import { CreateTaskDto, PaginatedResponseDto, UpdateTaskDto } from '@repo/types'
 import { lastValueFrom } from 'rxjs'
 import { EntityManager, Repository } from 'typeorm'
 import { TaskAssigneeService } from './task-assignee.service'
-import { TaskCommentService } from './task-comment.service'
 import { TaskHistoryService } from './task-history.service'
 
 @Injectable()
@@ -26,7 +19,6 @@ export class TasksService {
     @Inject(AUTH_SERVICE_NAME)
     private readonly authClient: ClientProxy,
     private readonly entityManager: EntityManager,
-    private readonly taskCommentService: TaskCommentService,
     private readonly taskHistoryService: TaskHistoryService,
     private readonly taskAssigneeService: TaskAssigneeService,
   ) {}
@@ -251,59 +243,5 @@ export class TasksService {
 
       await manager.remove(task)
     })
-  }
-
-  async createComment(
-    taskId: string,
-    createCommentDto: CreateTaskCommentDto,
-    userId: string,
-  ): Promise<TaskComment> {
-    return await this.entityManager.transaction(async manager => {
-      // Verificar se a task existe
-      const task = await manager.findOne(Task, { where: { id: taskId } })
-      if (!task) {
-        throw new HttpException(`Task with ID ${taskId} not found`, 404)
-      }
-
-      const comment = await this.taskCommentService.createWithManager(
-        manager,
-        taskId,
-        userId,
-        createCommentDto.content,
-      )
-
-      // Registrar histórico
-      await this.taskHistoryService.createWithManager(
-        manager,
-        taskId,
-        userId,
-        'Comment added',
-        { commentId: comment.id },
-      )
-
-      // Publicar evento (fora da transação)
-      this.notificationsClient.emit('task.comment.created', {
-        taskId,
-        commentId: comment.id,
-        authorId: userId,
-        content: comment.content,
-      })
-
-      return comment
-    })
-  }
-
-  async getComments(
-    taskId: string,
-    page: number = 1,
-    size: number = 10,
-  ): Promise<PaginatedResponseDto<TaskComment>> {
-    // Verificar se a task existe
-    const task = await this.tasksRepository.findOne({ where: { id: taskId } })
-    if (!task) {
-      throw new HttpException(`Task with ID ${taskId} not found`, 404)
-    }
-
-    return this.taskCommentService.findByTaskId(taskId, page, size)
   }
 }

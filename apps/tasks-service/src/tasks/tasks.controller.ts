@@ -2,10 +2,8 @@ import { RpcExceptionInterceptor } from '@/shared/interceptors/rpc-exception.int
 import { Controller, HttpException, UseInterceptors } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import {
-  CreateCommentPayload,
   CreateTaskPayload,
   FindAllTasksPayload,
-  GetCommentsPayload,
   RemoveTaskPayload,
   UpdateTaskPayload,
 } from '@repo/types'
@@ -51,23 +49,5 @@ export class TasksController {
   async remove(@Payload() payload: RemoveTaskPayload) {
     await this.tasksService.remove(payload.id, payload.userId)
     return { message: 'Task deleted successfully' }
-  }
-
-  @MessagePattern('create-task-comment')
-  async createComment(@Payload() payload: CreateCommentPayload) {
-    return await this.tasksService.createComment(
-      payload.taskId,
-      payload.createCommentDto,
-      payload.userId,
-    )
-  }
-
-  @MessagePattern('get-task-comments')
-  async getComments(@Payload() payload: GetCommentsPayload) {
-    return await this.tasksService.getComments(
-      payload.taskId,
-      payload.page || 1,
-      payload.size || 10,
-    )
   }
 }

@@ -1,5 +1,4 @@
 import { TaskAssignee } from '@/shared/database/entities/task-assignee.entity'
-import { TaskComment } from '@/shared/database/entities/task-comment.entity'
 import { TaskHistory } from '@/shared/database/entities/task-history.entity'
 import { Task } from '@/shared/database/entities/task.entity'
 
@@ -13,14 +12,13 @@ import {
   NOTIFICATIONS_SERVICE_QUEUE,
 } from '@repo/consts'
 import { TaskAssigneeService } from './task-assignee.service'
-import { TaskCommentService } from './task-comment.service'
 import { TaskHistoryService } from './task-history.service'
 import { TasksController } from './tasks.controller'
 import { TasksService } from './tasks.service'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task, TaskComment, TaskHistory, TaskAssignee]),
+    TypeOrmModule.forFeature([Task, TaskHistory, TaskAssignee]),
     ClientsModule.register([
       {
         name: NOTIFICATIONS_SERVICE_NAME,
@@ -47,11 +45,7 @@ import { TasksService } from './tasks.service'
     ]),
   ],
   controllers: [TasksController],
-  providers: [
-    TasksService,
-    TaskCommentService,
-    TaskHistoryService,
-    TaskAssigneeService,
-  ],
+  providers: [TasksService, TaskHistoryService, TaskAssigneeService],
+  exports: [TaskHistoryService],
 })
 export class TasksModule {}
