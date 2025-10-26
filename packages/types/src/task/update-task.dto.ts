@@ -1,6 +1,10 @@
+import { Type } from "class-transformer";
 import {
+  IsArray,
   IsDate,
   IsEnum,
+  IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -25,6 +29,7 @@ export class UpdateTaskDto {
   description?: string;
 
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   dueAt?: Date;
 
@@ -36,13 +41,19 @@ export class UpdateTaskDto {
   @IsEnum(TaskStatusEnum)
   status?: TaskStatusEnum;
 
+  @IsOptional()
+  @IsArray()
+  @IsUUID("4", { each: true })
+  assigneeIds?: string[];
+
   constructor(
     id?: string,
     title?: string,
     description?: string,
     dueAt?: Date,
     priority?: TaskPriorityEnum,
-    status?: TaskStatusEnum
+    status?: TaskStatusEnum,
+    assigneeIds?: string[]
   ) {
     this.id = id;
     this.title = title;
@@ -50,5 +61,27 @@ export class UpdateTaskDto {
     this.dueAt = dueAt;
     this.priority = priority;
     this.status = status;
+    this.assigneeIds = assigneeIds;
+  }
+}
+
+export class UpdateTaskPayload {
+  @IsUUID()
+  @IsNotEmpty()
+  id: string;
+
+  @IsObject()
+  @Type(() => UpdateTaskDto)
+  @IsNotEmpty()
+  updateTaskDto: UpdateTaskDto;
+
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
+
+  constructor(id: string, updateTaskDto: UpdateTaskDto, userId: string) {
+    this.id = id;
+    this.updateTaskDto = updateTaskDto;
+    this.userId = userId;
   }
 }

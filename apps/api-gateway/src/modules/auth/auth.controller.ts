@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger'
 import { AUTH_SERVICE_NAME } from '@repo/consts'
 import { CreateUserDto, LoginDto, UpdateUserDto } from '@repo/types'
-import { lastValueFrom } from 'rxjs'
+import { catchError, lastValueFrom, throwError } from 'rxjs'
 
 @Controller('auth')
 export class AuthController {
@@ -89,12 +89,14 @@ export class AuthController {
   })
   async register(@Body() body: CreateUserDto) {
     const result = await lastValueFrom(
-      this.authService.send('create-user', body),
+      this.authService.send('create-user', body).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
     )
-
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
 
     return result
   }
@@ -142,10 +144,16 @@ export class AuthController {
     },
   })
   async login(@Body() body: LoginDto) {
-    const result = await lastValueFrom(this.authService.send('login', body))
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+    const result = await lastValueFrom(
+      this.authService.send('login', body).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
+    )
+
     return result
   }
 
@@ -186,11 +194,15 @@ export class AuthController {
   })
   async refreshToken(@Body('refreshToken') refreshToken: string) {
     const result = await lastValueFrom(
-      this.authService.send('refresh-token', refreshToken),
+      this.authService.send('refresh-token', refreshToken).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
     )
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+
     return result
   }
 
@@ -249,11 +261,15 @@ export class AuthController {
   })
   async getAllUsers() {
     const result = await lastValueFrom(
-      this.authService.send('find-all-users', {}),
+      this.authService.send('find-all-users', {}).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
     )
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+
     return result
   }
 
@@ -312,11 +328,15 @@ export class AuthController {
   })
   async getUserById(@Param('id') id: string) {
     const result = await lastValueFrom(
-      this.authService.send('find-user-by-id', id),
+      this.authService.send('find-user-by-id', id).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
     )
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+
     return result
   }
 
@@ -394,11 +414,15 @@ export class AuthController {
     updateUserDto.id = id
 
     const result = await lastValueFrom(
-      this.authService.send('update-user', updateUserDto),
+      this.authService.send('update-user', updateUserDto).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
     )
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+
     return result
   }
 
@@ -440,10 +464,16 @@ export class AuthController {
     },
   })
   async deleteUserById(@Param('id') id: string) {
-    const result = await lastValueFrom(this.authService.send('remove-user', id))
-    if (result.status && result.message) {
-      throw new HttpException(result.message, result.status)
-    }
+    const result = await lastValueFrom(
+      this.authService.send('remove-user', id).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
+    )
+
     return result
   }
 }

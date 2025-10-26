@@ -1,9 +1,11 @@
-import { Controller } from '@nestjs/common'
+import { RpcExceptionInterceptor } from '@/shared/interceptors/rpc-exception.interceptor'
+import { Controller, UseInterceptors } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import { LoginDto } from '@repo/types'
 import { AuthService } from './auth.service'
 
 @Controller()
+@UseInterceptors(RpcExceptionInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

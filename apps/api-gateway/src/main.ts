@@ -5,6 +5,7 @@ import 'dotenv/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { apiReference } from '@scalar/nestjs-api-reference'
 import { AppModule } from './app.module'
+import { ExceptionInterceptor } from './shared/interceptors/exception.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -26,6 +27,7 @@ async function bootstrap() {
 
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalFilters(new ExceptionInterceptor())
   app.setGlobalPrefix('api')
 
   const port = process.env.PORT ?? 3000

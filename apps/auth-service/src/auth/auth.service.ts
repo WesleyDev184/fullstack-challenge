@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import {
-  HttpError,
   LoginDto,
   ResponseTokensDto,
   ResponseValidateTokenDto,
@@ -16,17 +15,17 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<ResponseTokensDto | HttpError> {
+  async login(loginDto: LoginDto): Promise<ResponseTokensDto> {
     const { email, password } = loginDto
     const user = await this.usersService.findByEmail(email)
 
     if (!user || !user.password) {
-      return new HttpError('Invalid credentials', 401)
+      throw new HttpException('Invalid credentials', 401)
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      return new HttpError('Invalid credentials', 401)
+      throw new HttpException('Invalid credentials', 401)
     }
 
     const tokens = await this.generateTokens(user.id, user.email)
@@ -36,15 +35,15 @@ export class AuthService {
 
   async validateToken(
     token: string,
-  ): Promise<ResponseValidateTokenDto | HttpError> {
+  ): Promise<ResponseValidateTokenDto | HttpException> {
     try {
       await this.jwtService.verify(token)
       const id = this.jwtService.decode(token) as { sub: string }
 
       const user = await this.usersService.findOne(id.sub)
 
-      if (user instanceof HttpError) {
-        return new HttpError('User not found', 404)
+      if (user instanceof HttpException) {
+        throw new HttpException('User not found', 404)
       }
 
       return {
@@ -52,11 +51,13 @@ export class AuthService {
         user,
       }
     } catch (error) {
-      return new HttpError('Invalid token', 401)
+      throw new HttpException('Invalid token', 401)
     }
   }
 
-  async refreshToken(token: string): Promise<ResponseTokensDto | HttpError> {
+  async refreshToken(
+    token: string,
+  ): Promise<ResponseTokensDto | HttpException> {
     try {
       const payload = this.jwtService.verify(token)
 
@@ -64,7 +65,7 @@ export class AuthService {
 
       return tokens
     } catch (error) {
-      return new HttpError('Invalid refresh token', 401)
+      return new HttpException('Invalid refresh token', 401)
     }
   }
 

@@ -130,7 +130,6 @@ services:
       - "5432:5432"
     networks:
       - challenge-network
-    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -143,7 +142,6 @@ services:
     image: rabbitmq:3.13-management-alpine
     container_name: rabbitmq
     attach: false
-    restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
