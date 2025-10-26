@@ -3,7 +3,13 @@ import { HttpException, Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AUTH_SERVICE_NAME, NOTIFICATIONS_SERVICE_NAME } from '@repo/consts'
-import { CreateTaskDto, PaginatedResponseDto, UpdateTaskDto } from '@repo/types'
+import {
+  CreateNotificationDto,
+  CreateTaskDto,
+  NotificationCategoryEnum,
+  PaginatedResponseDto,
+  UpdateTaskDto,
+} from '@repo/types'
 import { lastValueFrom } from 'rxjs'
 import { EntityManager, Repository } from 'typeorm'
 import { TaskAssigneeService } from './task-assignee.service'
@@ -75,12 +81,16 @@ export class TasksService {
       )
 
       // Publicar evento (fora da transação)
-      this.notificationsClient.emit('task.created', {
-        taskId: savedTask.id,
-        title: savedTask.title,
-        createdBy: userId,
-        assigneeIds: assigneeIds || [],
-      })
+      this.notificationsClient.emit(
+        'create.notification',
+        new CreateNotificationDto(
+          userId,
+          'Task Updated',
+          `The task "${task.title}" has been updated.`,
+          NotificationCategoryEnum.ASSIGNMENT,
+          assigneeIds,
+        ),
+      )
 
       return savedTask
     })
@@ -215,11 +225,16 @@ export class TasksService {
       }
 
       // Publicar evento (fora da transação)
-      this.notificationsClient.emit('task.updated', {
-        taskId: id,
-        updatedBy: userId,
-        changes,
-      })
+      this.notificationsClient.emit(
+        'create.notification',
+        new CreateNotificationDto(
+          userId,
+          'Task Updated',
+          `The task "${task.title}" has been updated.`,
+          NotificationCategoryEnum.ASSIGNMENT,
+          assigneeIds,
+        ),
+      )
 
       return task
     })

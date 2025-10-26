@@ -82,8 +82,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 400 },
+        statusCode: { type: 'number', example: 400 },
         message: { type: 'string', example: 'Mensagem de erro' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/register' },
       },
     },
   })
@@ -138,8 +144,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Credenciais inválidas' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/login' },
       },
     },
   })
@@ -187,8 +199,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Token de atualização inválido' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/refresh' },
       },
     },
   })
@@ -254,8 +272,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Não autorizado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users' },
       },
     },
   })
@@ -310,8 +334,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 404 },
+        statusCode: { type: 'number', example: 404 },
         message: { type: 'string', example: 'Usuário não encontrado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })
@@ -321,8 +351,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Não autorizado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })
@@ -391,8 +427,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 404 },
+        statusCode: { type: 'number', example: 404 },
         message: { type: 'string', example: 'Usuário não encontrado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })
@@ -402,8 +444,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Não autorizado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })
@@ -447,8 +495,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 404 },
+        statusCode: { type: 'number', example: 404 },
         message: { type: 'string', example: 'Usuário não encontrado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })
@@ -458,8 +512,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'number', example: 401 },
+        statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Não autorizado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users/:id' },
       },
     },
   })

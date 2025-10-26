@@ -4,7 +4,12 @@ import { HttpException, Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
 import { NOTIFICATIONS_SERVICE_NAME } from '@repo/consts'
-import { CreateTaskCommentDto, PaginatedResponseDto } from '@repo/types'
+import {
+  CreateNotificationDto,
+  CreateTaskCommentDto,
+  NotificationCategoryEnum,
+  PaginatedResponseDto,
+} from '@repo/types'
 import { EntityManager, Repository } from 'typeorm'
 import { TaskHistoryService } from '../tasks/task-history.service'
 
@@ -50,12 +55,15 @@ export class TaskCommentsService {
       )
 
       // Publicar evento (fora da transação)
-      this.notificationsClient.emit('task.comment.created', {
-        taskId,
-        commentId: comment.id,
-        authorId: userId,
-        content: comment.content,
-      })
+      this.notificationsClient.emit(
+        'create.notification',
+        new CreateNotificationDto(
+          userId,
+          'Task Updated',
+          `The task "${task.title}" has been updated.`,
+          NotificationCategoryEnum.ASSIGNMENT,
+        ),
+      )
 
       return comment
     })

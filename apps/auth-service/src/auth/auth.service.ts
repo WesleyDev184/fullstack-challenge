@@ -43,7 +43,7 @@ export class AuthService {
       const user = await this.usersService.findOne(id.sub)
 
       if (user instanceof HttpException) {
-        throw new HttpException('User not found', 404)
+        throw new HttpException('User not found', 401)
       }
 
       return {
