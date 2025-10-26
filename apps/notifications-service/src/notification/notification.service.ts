@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { CreateNotificationDto } from '@repo/types'
+import { Notification } from '@shared/database/entities/notification.entity'
+import { EntityManager, Repository } from 'typeorm'
+import { NotificationGateway } from './notification.gateway'
 
 @Injectable()
 export class NotificationService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
-  }
+  constructor(
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
+    private readonly entityManager: EntityManager,
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
-  findAll() {
-    return `This action returns all notification`;
-  }
+  async createNotification(createNotificationDto: CreateNotificationDto) {
+    const notification = this.notificationRepository.create({
+      recipientId: createNotificationDto.recipientId,
+      title: createNotificationDto.title,
+      content: createNotificationDto.content,
+      category: createNotificationDto.category,
+    })
+    await this.entityManager.save(notification)
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+    this.notificationGateway.server.emit('notification', notification)
   }
 }

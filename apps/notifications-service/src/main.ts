@@ -7,21 +7,26 @@ import { AppModule } from './app.module'
 
 async function bootstrap() {
   const logger = new Logger()
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://admin:admin@localhost:5672'],
-        queue: NOTIFICATIONS_SERVICE_QUEUE,
-        queueOptions: {
-          durable: true,
-        },
+  const app = await NestFactory.create(AppModule)
+
+  app.enableCors()
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://admin:admin@localhost:5672'],
+      queue: NOTIFICATIONS_SERVICE_QUEUE,
+      queueOptions: {
+        durable: true,
       },
     },
+  })
+
+  await app.startAllMicroservices()
+  await app.listen(process.env.PORT || 3004)
+  logger.log(
+    `Notifications Service is running on RMQ and HTTP on port ${process.env.PORT || 3004}`,
   )
-  await app.listen()
-  logger.log(`Notifications Service is running on RMQ`)
 }
 
 void bootstrap()

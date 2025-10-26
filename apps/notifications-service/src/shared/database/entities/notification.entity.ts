@@ -1,3 +1,4 @@
+import { NotificationCategoryEnum } from '@repo/types'
 import {
   Column,
   CreateDateColumn,
@@ -5,7 +6,6 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { NotificationCategoryEnum } from '../enums/notification-category.enum'
 
 @Entity('notification')
 @Index('IDX_notification_recipient_created_at', ['recipientId', 'createdAt'])
