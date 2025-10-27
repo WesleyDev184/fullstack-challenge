@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 
+import { HealthController } from './health/health.controller'
 import { DatabaseModule } from './shared/database/database.module'
 import { TaskCommentsModule } from './task-comments/task-comments.module'
 import { TasksModule } from './tasks/tasks.module'
@@ -12,7 +13,7 @@ import { TasksModule } from './tasks/tasks.module'
     TasksModule,
     TaskCommentsModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}

@@ -20,6 +20,7 @@
     "@nestjs/microservices": "^11.1.7",
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^11.2.1",
+    "@nestjs/terminus": "^11.0.0",
     "@repo/consts": "workspace:*",
     "@repo/types": "workspace:*",
     "@scalar/nestjs-api-reference": "^1.0.5",
