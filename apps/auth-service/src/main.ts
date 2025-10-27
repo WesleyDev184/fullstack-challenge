@@ -4,6 +4,7 @@ import 'dotenv/config'
 import { Logger } from '@nestjs/common'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { AUTH_SERVICE_QUEUE } from '@repo/consts'
+import { CustomLoggerService } from '@repo/logger'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
@@ -19,6 +20,7 @@ async function bootstrap() {
           durable: true,
         },
       },
+      logger: new CustomLoggerService(),
     },
   )
   await app.listen()

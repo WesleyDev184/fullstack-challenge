@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { TASKS_SERVICE_QUEUE } from '@repo/consts'
+import { CustomLoggerService } from '@repo/logger'
 import 'dotenv/config'
 import { AppModule } from './app.module'
 
@@ -18,6 +19,7 @@ async function bootstrap() {
           durable: true,
         },
       },
+      logger: new CustomLoggerService(),
     },
   )
   await app.listen()

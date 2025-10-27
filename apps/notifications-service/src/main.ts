@@ -2,12 +2,15 @@ import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { NOTIFICATIONS_SERVICE_QUEUE } from '@repo/consts'
+import { CustomLoggerService } from '@repo/logger'
 import 'dotenv/config'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
   const logger = new Logger()
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger: new CustomLoggerService(),
+  })
 
   app.enableCors()
 
