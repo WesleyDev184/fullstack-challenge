@@ -10,12 +10,16 @@ import {
 @Entity('notification')
 @Index('IDX_notification_assignee_ids', ['assigneeIds'])
 @Index('IDX_notification_created_at', ['createdAt'])
+@Index('IDX_notification_task_id', ['taskId'])
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
   @Column('uuid', { name: 'assignee_ids', array: true, default: () => "'{}'" })
   assigneeIds: string[]
+
+  @Column('uuid', { name: 'task_id', nullable: true })
+  taskId: string | null
 
   @Column('varchar')
   title: string

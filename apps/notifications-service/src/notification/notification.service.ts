@@ -15,6 +15,7 @@ export class NotificationService {
   async createNotification(createNotificationDto: CreateNotificationDto) {
     const notification = this.notificationRepository.create({
       assigneeIds: createNotificationDto.assigneeIds,
+      taskId: createNotificationDto.taskId,
       title: createNotificationDto.title,
       content: createNotificationDto.content,
       category: createNotificationDto.category,
