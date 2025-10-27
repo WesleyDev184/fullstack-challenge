@@ -8,16 +8,14 @@ import {
 } from 'typeorm'
 
 @Entity('notification')
-@Index('IDX_notification_recipient_created_at', ['recipientId', 'createdAt'])
-@Index('IDX_notification_recipient_unread', ['readAt'], {
-  where: '"read_at" IS NULL',
-})
+@Index('IDX_notification_assignee_ids', ['assigneeIds'])
+@Index('IDX_notification_created_at', ['createdAt'])
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({ type: 'uuid', name: 'recipient_id' })
-  recipientId: string
+  @Column('uuid', { name: 'assignee_ids', array: true, default: () => "'{}'" })
+  assigneeIds: string[]
 
   @Column('varchar')
   title: string
@@ -30,9 +28,6 @@ export class Notification {
     enum: NotificationCategoryEnum,
   })
   category: NotificationCategoryEnum
-
-  @Column({ type: 'timestamp', nullable: true, name: 'read_at' })
-  readAt: Date
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date

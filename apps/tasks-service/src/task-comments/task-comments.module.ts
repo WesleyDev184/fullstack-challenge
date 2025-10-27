@@ -1,3 +1,4 @@
+import { TaskAssignee } from '@/shared/database/entities/task-assignee.entity'
 import { TaskComment } from '@/shared/database/entities/task-comment.entity'
 import { TaskHistory } from '@/shared/database/entities/task-history.entity'
 import { Task } from '@/shared/database/entities/task.entity'
@@ -14,7 +15,7 @@ import { TaskCommentsService } from './task-comments.service'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TaskComment, Task, TaskHistory]),
+    TypeOrmModule.forFeature([TaskComment, Task, TaskHistory, TaskAssignee]),
     ClientsModule.register([
       {
         name: NOTIFICATIONS_SERVICE_NAME,

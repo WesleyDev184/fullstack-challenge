@@ -1,3 +1,4 @@
+import { TaskAssignee } from '@/shared/database/entities/task-assignee.entity'
 import { TaskComment } from '@/shared/database/entities/task-comment.entity'
 import { Task } from '@/shared/database/entities/task.entity'
 import { HttpException, Inject, Injectable } from '@nestjs/common'
@@ -20,6 +21,8 @@ export class TaskCommentsService {
     private readonly taskCommentRepository: Repository<TaskComment>,
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
+    @InjectRepository(TaskAssignee)
+    private readonly taskAssigneeRepository: Repository<TaskAssignee>,
     @Inject(NOTIFICATIONS_SERVICE_NAME)
     private readonly notificationsClient: ClientProxy,
     private readonly entityManager: EntityManager,
@@ -54,14 +57,21 @@ export class TaskCommentsService {
         { commentId: comment.id },
       )
 
-      // Publicar evento (fora da transação)
+      const assignees = await this.taskAssigneeRepository.find({
+        select: ['userId'],
+        where: { taskId },
+      })
+
+      const assigneeIds = [userId, ...new Set(assignees.map(a => a.userId))]
+
+      // Publicar evento (dentro da transação)
       this.notificationsClient.emit(
         'create.notification',
         new CreateNotificationDto(
-          userId,
           'Task Updated',
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
+          assigneeIds,
         ),
       )
 

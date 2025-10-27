@@ -9,7 +9,6 @@ export class NotificationController {
 
   @MessagePattern('create.notification')
   createNotification(@Payload() createNotificationDto: CreateNotificationDto) {
-    console.log('Received create.notification message:', createNotificationDto)
     return this.notificationService.createNotification(createNotificationDto)
   }
 }

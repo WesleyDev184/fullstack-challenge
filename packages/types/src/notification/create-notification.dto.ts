@@ -8,10 +8,6 @@ import {
 import { NotificationCategoryEnum } from "./enums/notification-category.enum";
 
 export class CreateNotificationDto {
-  @IsUUID()
-  @IsNotEmpty()
-  recipientId: string;
-
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -27,16 +23,14 @@ export class CreateNotificationDto {
   @IsNotEmpty({ each: true })
   @IsUUID("4", { each: true })
   @IsOptional()
-  assigneeIds?: string[];
+  assigneeIds: string[];
 
   constructor(
-    recipientId: string,
     title: string,
     content: string,
     category: NotificationCategoryEnum,
-    assigneeIds?: string[]
+    assigneeIds: string[]
   ) {
-    this.recipientId = recipientId;
     this.title = title;
     this.content = content;
     this.category = category;

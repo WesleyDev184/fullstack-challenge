@@ -84,11 +84,10 @@ export class TasksService {
       this.notificationsClient.emit(
         'create.notification',
         new CreateNotificationDto(
-          userId,
           'Task Updated',
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
-          assigneeIds,
+          assigneeIds ? [userId, ...assigneeIds] : [],
         ),
       )
 
@@ -228,11 +227,10 @@ export class TasksService {
       this.notificationsClient.emit(
         'create.notification',
         new CreateNotificationDto(
-          userId,
           'Task Updated',
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
-          assigneeIds,
+          assigneeIds ? [userId, ...assigneeIds] : [],
         ),
       )
 
