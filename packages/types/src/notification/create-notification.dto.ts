@@ -12,6 +12,10 @@ export class CreateNotificationDto {
   @IsString()
   title: string;
 
+  @IsOptional()
+  @IsUUID("4")
+  taskId: string | null;
+
   @IsNotEmpty()
   @IsString()
   content: string;
@@ -27,11 +31,13 @@ export class CreateNotificationDto {
 
   constructor(
     title: string,
+    taskId: string | null,
     content: string,
     category: NotificationCategoryEnum,
     assigneeIds: string[]
   ) {
     this.title = title;
+    this.taskId = taskId;
     this.content = content;
     this.category = category;
     this.assigneeIds = assigneeIds;

@@ -36,7 +36,7 @@ export class TaskCommentsService {
   ): Promise<TaskComment> {
     return await this.entityManager.transaction(async manager => {
       // Verificar se a task existe
-      const task = await manager.findOne(Task, { where: { id: taskId } })
+      const task = await this.tasksRepository.findOne({ where: { id: taskId } })
       if (!task) {
         throw new HttpException(`Task with ID ${taskId} not found`, 404)
       }
@@ -69,6 +69,7 @@ export class TaskCommentsService {
         'create.notification',
         new CreateNotificationDto(
           'Task Updated',
+          taskId,
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
           assigneeIds,
@@ -85,7 +86,7 @@ export class TaskCommentsService {
     authorId: string,
     content: string,
   ): Promise<TaskComment> {
-    const comment = manager.create(TaskComment, {
+    const comment = this.taskCommentRepository.create({
       taskId,
       authorId,
       content,

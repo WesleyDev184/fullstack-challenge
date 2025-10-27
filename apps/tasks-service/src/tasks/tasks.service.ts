@@ -55,7 +55,7 @@ export class TasksService {
         }
       }
 
-      const task = manager.create(Task, {
+      const task = this.tasksRepository.create({
         ...taskData,
         createdBy: userId,
       })
@@ -84,7 +84,8 @@ export class TasksService {
       this.notificationsClient.emit(
         'create.notification',
         new CreateNotificationDto(
-          'Task Updated',
+          'Task Created',
+          savedTask.id,
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
           assigneeIds ? [userId, ...assigneeIds] : [],
@@ -128,7 +129,7 @@ export class TasksService {
     userId: string,
   ): Promise<Task> {
     return await this.entityManager.transaction(async manager => {
-      const task = await manager.findOne(Task, { where: { id } })
+      const task = await this.tasksRepository.findOne({ where: { id } })
 
       if (!task) {
         throw new HttpException(`Task with ID ${id} not found`, 404)
@@ -228,6 +229,7 @@ export class TasksService {
         'create.notification',
         new CreateNotificationDto(
           'Task Updated',
+          task.id,
           `The task "${task.title}" has been updated.`,
           NotificationCategoryEnum.ASSIGNMENT,
           assigneeIds ? [userId, ...assigneeIds] : [],
@@ -240,7 +242,7 @@ export class TasksService {
 
   async remove(id: string, userId: string): Promise<void> {
     await this.entityManager.transaction(async manager => {
-      const task = await manager.findOne(Task, { where: { id } })
+      const task = await this.tasksRepository.findOne({ where: { id } })
 
       if (!task) {
         throw new HttpException(`Task with ID ${id} not found`, 404)
