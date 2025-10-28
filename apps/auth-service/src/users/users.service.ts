@@ -3,8 +3,9 @@ import { HttpException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import {
   CreateUserDto,
+  FindAllUsersPayload,
+  PaginatedResponseDto,
   ResponseUserDto,
-  ResponseUserListDto,
   UpdateUserDto,
 } from '@repo/types'
 import * as bcrypt from 'bcryptjs'
@@ -52,21 +53,38 @@ export class UsersService {
     )
   }
 
-  async findAll(): Promise<ResponseUserListDto> {
-    const [users, count] = await this.usersRepository.findAndCount()
-    return new ResponseUserListDto(
-      count,
-      users.map(
-        user =>
-          new ResponseUserDto(
-            user.id,
-            user.email,
-            user.username,
-            user.createdAt,
-            user.updatedAt,
-          ),
-      ),
+  async findAll(
+    payload: FindAllUsersPayload,
+  ): Promise<PaginatedResponseDto<ResponseUserDto>> {
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+
+    const { page = 1, size = 10, search } = payload
+    if (search) {
+      queryBuilder.where(
+        'user.username ILIKE :search OR user.email ILIKE :search',
+        { search: `%${search}%` },
+      )
+    }
+
+    queryBuilder
+      .orderBy('user.createdAt', 'DESC')
+      .skip((page - 1) * size)
+      .take(size)
+
+    const [users, total] = await queryBuilder.getManyAndCount()
+
+    const data = users.map(
+      user =>
+        new ResponseUserDto(
+          user.id,
+          user.email,
+          user.username,
+          user.createdAt,
+          user.updatedAt,
+        ),
     )
+
+    return new PaginatedResponseDto(data, page, size, total)
   }
 
   async findOne(id: string): Promise<ResponseUserDto> {
@@ -138,7 +156,7 @@ export class UsersService {
         ) {
           return new HttpException(error.message, 409)
         }
-        throw error // Re-throw outros erros
+        throw error
       })
 
     if (!res) {

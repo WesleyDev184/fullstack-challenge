@@ -52,6 +52,24 @@ export class FindAllTasksPayload {
   }
 }
 
+export class FindAllUsersPayload {
+  @IsNumber()
+  @IsOptional()
+  page?: number;
+  @IsNumber()
+  @IsOptional()
+  size?: number;
+  @IsOptional()
+  @IsNotEmpty()
+  search?: string;
+
+  constructor(paginationDto: PaginationDto, search?: string) {
+    this.page = paginationDto.page;
+    this.size = paginationDto.size;
+    this.search = search;
+  }
+}
+
 export class GetCommentsPayload {
   @IsUUID()
   @IsNotEmpty()

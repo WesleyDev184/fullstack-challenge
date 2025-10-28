@@ -1,7 +1,7 @@
 import { RpcExceptionInterceptor } from '@/shared/interceptors/rpc-exception.interceptor'
 import { Controller, HttpException, UseInterceptors } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import { CreateUserDto, UpdateUserDto } from '@repo/types'
+import { CreateUserDto, FindAllUsersPayload, UpdateUserDto } from '@repo/types'
 import { UsersService } from './users.service'
 
 @Controller()
@@ -15,8 +15,8 @@ export class UsersController {
   }
 
   @MessagePattern('find-all-users')
-  async findAll() {
-    return await this.usersService.findAll()
+  async findAll(@Payload() payload: FindAllUsersPayload) {
+    return await this.usersService.findAll(payload)
   }
 
   @MessagePattern('find-user-by-id')
