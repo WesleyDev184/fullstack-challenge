@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client'
 import { routeTree } from './routeTree.gen'
 
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
+import { AuthProvider } from './provider/auth-provider.tsx'
 import { ReactQueryProvider } from './provider/react-query-provider.tsx'
 import { ThemeProvider } from './provider/theme-provider.tsx'
 import reportWebVitals from './reportWebVitals.ts'
@@ -37,7 +38,9 @@ if (rootElement && !rootElement.innerHTML) {
       <NuqsAdapter>
         <ReactQueryProvider>
           <ThemeProvider storageKey='theme'>
-            <RouterProvider router={router} />
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
           </ThemeProvider>
         </ReactQueryProvider>
       </NuqsAdapter>

@@ -14,7 +14,7 @@ async function bootstrap() {
   })
 
   const logger = new Logger()
-
+  
   const config = new DocumentBuilder()
     .setTitle('Fullstack Challenge API')
     .setDescription('The Fullstack Challenge API description')

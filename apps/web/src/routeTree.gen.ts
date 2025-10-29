@@ -9,50 +9,91 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as PtdRouteImport } from './routes/_ptd'
+import { Route as PtdIndexRouteImport } from './routes/_ptd/index'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
-const IndexRoute = IndexRouteImport.update({
+const PtdRoute = PtdRouteImport.update({
+  id: '/_ptd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PtdIndexRoute = PtdIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PtdRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/': typeof PtdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/': typeof PtdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_ptd': typeof PtdRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/_ptd/': typeof PtdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/auth/login' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/auth/login' | '/'
+  id: '__root__' | '/_ptd' | '/auth/login' | '/_ptd/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  PtdRoute: typeof PtdRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_ptd': {
+      id: '/_ptd'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PtdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_ptd/': {
+      id: '/_ptd/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof PtdIndexRouteImport
+      parentRoute: typeof PtdRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
+interface PtdRouteChildren {
+  PtdIndexRoute: typeof PtdIndexRoute
+}
+
+const PtdRouteChildren: PtdRouteChildren = {
+  PtdIndexRoute: PtdIndexRoute,
+}
+
+const PtdRouteWithChildren = PtdRoute._addFileChildren(PtdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  PtdRoute: PtdRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

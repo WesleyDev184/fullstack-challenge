@@ -1,5 +1,6 @@
 import { UserRoundIcon } from 'lucide-react'
 
+import { useAuth } from '@/provider/auth-provider'
 import { Link } from '@tanstack/react-router'
 import { Button } from './ui/button'
 import {
@@ -25,6 +26,8 @@ interface AuthDropdownProps {
 }
 
 export default function AuthDropdown({ user }: AuthDropdownProps) {
+  const { logout } = useAuth()
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       year: 'numeric',
@@ -101,6 +104,7 @@ export default function AuthDropdown({ user }: AuthDropdownProps) {
             variant='outline'
             size='default'
             className='w-full text-destructive'
+            onClick={logout}
           >
             Sair
           </Button>
