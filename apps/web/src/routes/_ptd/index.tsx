@@ -16,7 +16,7 @@ function index() {
 
   return (
     <ProtectedRoute>
-      <h1 className='text-2xl font-bold'>Tasks de {user?.username}</h1>
+      <h1 className='text-2xl font-bold'>Tasks de {user?.email}</h1>
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </ProtectedRoute>
   )
