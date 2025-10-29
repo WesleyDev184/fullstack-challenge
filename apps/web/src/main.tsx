@@ -1,12 +1,15 @@
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 
-import './styles.css'
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
+import { ReactQueryProvider } from './provider/react-query-provider.tsx'
+import { ThemeProvider } from './provider/theme-provider.tsx'
 import reportWebVitals from './reportWebVitals.ts'
+import './styles.css'
 
 // Create a new router instance
 const router = createRouter({
@@ -31,7 +34,13 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <NuqsAdapter>
+        <ReactQueryProvider>
+          <ThemeProvider storageKey='theme'>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </ReactQueryProvider>
+      </NuqsAdapter>
     </StrictMode>,
   )
 }
