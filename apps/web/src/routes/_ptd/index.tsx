@@ -1,22 +1,28 @@
 import { useAuth } from '@/hooks/use-auth'
-import { HealthServiceQuery } from '@/http/health/health.query'
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { Board } from './-components/board'
 
 export const Route = createFileRoute('/_ptd/')({
   component: index,
 })
 
 function index() {
-  const { data, isLoading, error } = HealthServiceQuery()
   const { user } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
+  useEffect(() => {
+    // Simular requisição com delay de 2 segundos
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
-    <div className='flex items-start justify-center w-full h-full p-2 border border-amber-300 '>
-      <h1 className='text-2xl font-bold'>Tasks de {user?.email}</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+    <div className='flex flex-col justify-start items-center w-full h-full p-4'>
+      <Board userName={user?.username ?? 'guest'} isLoading={isLoading} />
     </div>
   )
 }
