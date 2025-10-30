@@ -187,7 +187,6 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Atualizar tokens de autenticação' })
   @ApiBody({

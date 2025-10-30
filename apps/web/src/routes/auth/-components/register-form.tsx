@@ -15,50 +15,51 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/use-auth'
-import { loginSchema, type LoginFormData } from '@/http/auth/dto/auth.dto'
+import { registerSchema, type RegisterFormData } from '@/http/auth/dto/auth.dto'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useForm } from 'react-hook-form'
 
-export function LoginForm({
+export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const { login } = useAuth()
+  const { register: registerUser } = useAuth()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useQueryState(
     'isLoading',
     parseAsBoolean.withDefault(false),
   )
   const [error, setError] = useQueryState('error', parseAsString)
-  const [postRegister] = useQueryState('postRegister')
 
   const {
     register,
-    reset,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
   })
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     await setIsLoading(true)
     await setError(null)
 
     try {
-      await login(data)
+      await registerUser(data)
       reset()
 
-      // Navigate sem limpar os estados antes,
-      // pois a navegação vai para outra página
+      // Navigate para login com postRegister=true
       navigate({
-        to: '/',
+        to: '/auth/login',
+        search: {
+          postRegister: 'true',
+        },
       })
     } catch (err) {
-      await setError('Login failed. Please check your credentials.')
+      await setError('Registration failed. Please try again.')
       await setIsLoading(false)
     }
   }
@@ -67,29 +68,37 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className='text-center'>
-          <CardTitle className='text-xl'>
-            {postRegister === 'true'
-              ? 'Conta criada com sucesso!'
-              : 'Bem-vindo de volta'}
-          </CardTitle>
+          <CardTitle className='text-xl'>Create an account</CardTitle>
           <CardDescription>
-            {postRegister === 'true'
-              ? 'Faça seu primeiro login para continuar'
-              : 'Entre com sua conta para continuar'}
+            Cadastre-se para começar a gerenciar suas tarefas
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <FieldSeparator className='*:data-[slot=field-separator-content]:bg-card'>
-                Coloque o login abaixo
+                Preencha os dados abaixo
               </FieldSeparator>
+              <Field>
+                <FieldLabel htmlFor='username'>Username</FieldLabel>
+                <Input
+                  id='username'
+                  type='text'
+                  placeholder='johndoe'
+                  {...register('username')}
+                />
+                {errors.username && (
+                  <FieldDescription className='text-red-500'>
+                    {errors.username.message}
+                  </FieldDescription>
+                )}
+              </Field>
               <Field>
                 <FieldLabel htmlFor='email'>Email</FieldLabel>
                 <Input
                   id='email'
                   type='email'
-                  placeholder='m@example.com'
+                  placeholder='johndoe@example.com'
                   {...register('email')}
                 />
                 {errors.email && (
@@ -99,19 +108,11 @@ export function LoginForm({
                 )}
               </Field>
               <Field>
-                <div className='flex items-center'>
-                  <FieldLabel htmlFor='password'>Senha</FieldLabel>
-                  <a
-                    href='#'
-                    className='ml-auto text-sm underline-offset-4 hover:underline'
-                  >
-                    Esqueceu sua senha?
-                  </a>
-                </div>
+                <FieldLabel htmlFor='password'>Senha</FieldLabel>
                 <Input
                   id='password'
                   type='password'
-                  placeholder='*********'
+                  placeholder='strongpassword123'
                   {...register('password')}
                 />
                 {errors.password && (
@@ -127,15 +128,15 @@ export function LoginForm({
               )}
               <Field>
                 <Button type='submit' className='w-full' disabled={isLoading}>
-                  {isLoading ? 'Logging in...' : 'Login'}
+                  {isLoading ? 'Creating account...' : 'Create account'}
                 </Button>
                 <FieldDescription className='text-center'>
-                  Não tem uma conta?{' '}
+                  Já tem uma conta?{' '}
                   <Link
-                    to='/auth/register'
+                    to='/auth/login'
                     className='underline underline-offset-4'
                   >
-                    Cadastre-se
+                    Faça login
                   </Link>
                 </FieldDescription>
               </Field>
@@ -144,7 +145,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className='px-6 text-center'>
-        Ao clicar em continuar, você concorda com nossos{' '}
+        Ao clicar em criar conta, você concorda com nossos{' '}
         <a href='#' className='underline underline-offset-4'>
           Termos de Serviço
         </a>{' '}

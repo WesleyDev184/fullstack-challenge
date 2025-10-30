@@ -1,4 +1,5 @@
 import Header from '@/components/Header'
+import { ProtectedRoutes } from '@/components/protected-routes'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_ptd')({
@@ -9,9 +10,9 @@ function PtdLayout() {
   return (
     <>
       <Header />
-      <div className='h-[calc(100vh-6vh)] max-h-[calc(100vh-6vh)] flex flex-col'>
+      <ProtectedRoutes>
         <Outlet />
-      </div>
+      </ProtectedRoutes>
     </>
   )
 }

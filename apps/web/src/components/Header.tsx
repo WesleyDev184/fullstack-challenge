@@ -1,4 +1,4 @@
-import { useAuth } from '@/provider/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 import { Link } from '@tanstack/react-router'
 import AuthDropdown from './auth-dropdpwn'
 import { ModeToggle } from './mode-toggle'

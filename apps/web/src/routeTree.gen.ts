@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PtdRouteImport } from './routes/_ptd'
 import { Route as PtdIndexRouteImport } from './routes/_ptd/index'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
 const PtdRoute = PtdRouteImport.update({
@@ -22,6 +23,11 @@ const PtdIndexRoute = PtdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PtdRoute,
 } as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -30,29 +36,33 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/': typeof PtdIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/': typeof PtdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_ptd': typeof PtdRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/_ptd/': typeof PtdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth/login' | '/'
+  fullPaths: '/auth/login' | '/auth/register' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/login' | '/'
-  id: '__root__' | '/_ptd' | '/auth/login' | '/_ptd/'
+  to: '/auth/login' | '/auth/register' | '/'
+  id: '__root__' | '/_ptd' | '/auth/login' | '/auth/register' | '/_ptd/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PtdRoute: typeof PtdRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -70,6 +80,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PtdIndexRouteImport
       parentRoute: typeof PtdRoute
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
       id: '/auth/login'
@@ -94,6 +111,7 @@ const PtdRouteWithChildren = PtdRoute._addFileChildren(PtdRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   PtdRoute: PtdRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -9,7 +9,7 @@ export const Route = createRootRoute({
       <Outlet />
       <TanStackDevtools
         config={{
-          position: 'bottom-left',
+          position: 'bottom-right',
         }}
         plugins={[
           {
