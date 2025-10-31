@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 export function RegisterForm({
   className,
@@ -51,7 +52,7 @@ export function RegisterForm({
       await registerUser(data)
       reset()
 
-      // Navigate para login com postRegister=true
+      toast.success('Registration successful! Please log in.')
       navigate({
         to: '/auth/login',
         search: {

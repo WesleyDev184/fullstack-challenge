@@ -31,7 +31,7 @@ export class CustomLoggerService implements LoggerService {
             winston.format.printf(({ level, message, timestamp }) => {
               const color = colors[level] || colors.reset;
 
-              return `${color}[LOGGER]${colors.reset} - ${timestamp} - ${colors.distinctive} [${level === "info" ? "LOG" : level.toUpperCase()}]${colors.reset}${color} ${message}${colors.reset}:`;
+              return `${color}[LOGGER]${colors.reset} - ${timestamp} - ${colors.distinctive}[${level === "info" ? "LOG" : level.toUpperCase()}]${colors.reset}${color} ${message}${colors.reset}:`;
             })
           ),
         }),

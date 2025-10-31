@@ -6,6 +6,7 @@ import {
   FindAllUsersPayload,
   PaginatedResponseDto,
   ResponseUserDto,
+  ResponseUserProfileDto,
   UpdateUserDto,
 } from '@repo/types'
 import * as bcrypt from 'bcryptjs'
@@ -85,6 +86,21 @@ export class UsersService {
     )
 
     return new PaginatedResponseDto(data, page, size, total)
+  }
+
+  async findAllEmails(userIds: string[]): Promise<ResponseUserProfileDto> {
+    {
+      const users = await this.usersRepository.find({
+        select: ['email'],
+        where: { id: In(userIds) },
+      })
+
+      if (users.length !== userIds.length) {
+        throw new HttpException('One or more users not found', 404)
+      }
+
+      return new ResponseUserProfileDto(users.map(user => user.email))
+    }
   }
 
   async findOne(id: string): Promise<ResponseUserDto> {

@@ -13,6 +13,7 @@ import { Route as PtdRouteImport } from './routes/_ptd'
 import { Route as PtdIndexRouteImport } from './routes/_ptd/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as PtdTaskTaskIdRouteImport } from './routes/_ptd/task/$taskId'
 
 const PtdRoute = PtdRouteImport.update({
   id: '/_ptd',
@@ -33,16 +34,23 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PtdTaskTaskIdRoute = PtdTaskTaskIdRouteImport.update({
+  id: '/task/$taskId',
+  path: '/task/$taskId',
+  getParentRoute: () => PtdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/': typeof PtdIndexRoute
+  '/task/$taskId': typeof PtdTaskTaskIdRoute
 }
 export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/': typeof PtdIndexRoute
+  '/task/$taskId': typeof PtdTaskTaskIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,13 +58,20 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/_ptd/': typeof PtdIndexRoute
+  '/_ptd/task/$taskId': typeof PtdTaskTaskIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth/login' | '/auth/register' | '/'
+  fullPaths: '/auth/login' | '/auth/register' | '/' | '/task/$taskId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/login' | '/auth/register' | '/'
-  id: '__root__' | '/_ptd' | '/auth/login' | '/auth/register' | '/_ptd/'
+  to: '/auth/login' | '/auth/register' | '/' | '/task/$taskId'
+  id:
+    | '__root__'
+    | '/_ptd'
+    | '/auth/login'
+    | '/auth/register'
+    | '/_ptd/'
+    | '/_ptd/task/$taskId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,15 +110,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_ptd/task/$taskId': {
+      id: '/_ptd/task/$taskId'
+      path: '/task/$taskId'
+      fullPath: '/task/$taskId'
+      preLoaderRoute: typeof PtdTaskTaskIdRouteImport
+      parentRoute: typeof PtdRoute
+    }
   }
 }
 
 interface PtdRouteChildren {
   PtdIndexRoute: typeof PtdIndexRoute
+  PtdTaskTaskIdRoute: typeof PtdTaskTaskIdRoute
 }
 
 const PtdRouteChildren: PtdRouteChildren = {
   PtdIndexRoute: PtdIndexRoute,
+  PtdTaskTaskIdRoute: PtdTaskTaskIdRoute,
 }
 
 const PtdRouteWithChildren = PtdRoute._addFileChildren(PtdRouteChildren)

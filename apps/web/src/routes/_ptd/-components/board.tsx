@@ -1,9 +1,9 @@
 import { TaskStatusEnum } from '@/http/task/enums/task-status.enum'
-import { MOCK_TASKS } from '@/mocks/tasks.mock'
+import { TasksQuery } from '@/http/task/task-query'
 import { ColorStatus } from '@/utils/color-state'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { BoardCard } from './board-card'
 import { BoardColumn } from './board-column'
-import { BoardSkeleton } from './board-skeleton'
 
 const STATUS_LABELS: Record<TaskStatusEnum, string> = {
   [TaskStatusEnum.TODO]: 'A FAZER',
@@ -14,21 +14,18 @@ const STATUS_LABELS: Record<TaskStatusEnum, string> = {
 
 interface BoardProps {
   userName: string
-  isLoading?: boolean
 }
 
-export function Board({ userName, isLoading }: BoardProps) {
+export function Board({ userName }: BoardProps) {
   const columns = Object.values(TaskStatusEnum).map(status => ({
     key: status,
     label: STATUS_LABELS[status],
   }))
 
-  const getTasksByStatus = (status: TaskStatusEnum) => {
-    return MOCK_TASKS.filter(task => task.status === status)
-  }
+  const { data: tasks } = useSuspenseQuery(TasksQuery({ page: 1, size: 20 }))
 
-  if (isLoading) {
-    return <BoardSkeleton />
+  const getTasksByStatus = (status: TaskStatusEnum) => {
+    return tasks?.data.filter(task => task.status === status) ?? []
   }
 
   return (
@@ -49,15 +46,16 @@ export function Board({ userName, isLoading }: BoardProps) {
       {/* Kanban Board */}
       <div className='flex overflow-x-auto gap-4 flex-1 pb-2 justify-center max-h-full'>
         {columns.map(column => {
-          const tasks = getTasksByStatus(column.key as TaskStatusEnum)
+          const tasksRes = getTasksByStatus(column.key as TaskStatusEnum)
+
           return (
             <BoardColumn
               key={column.key}
               label={column.label}
               colorDot={ColorStatus(column.key as TaskStatusEnum)}
-              count={tasks.length}
+              count={tasksRes.length}
             >
-              {tasks.map(task => (
+              {tasksRes.map(task => (
                 <BoardCard key={task.id} task={task} />
               ))}
             </BoardColumn>

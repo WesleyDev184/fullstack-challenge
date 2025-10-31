@@ -26,6 +26,10 @@ export class UpdateTaskDto {
 
   @IsOptional()
   @IsString()
+  content?: string;
+
+  @IsOptional()
+  @IsString()
   description?: string;
 
   @IsOptional()

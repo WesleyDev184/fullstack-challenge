@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/stores/auth-store'
 import { getEnv } from '@/utils/env-manager'
 import axios from 'axios'
+import type { AuthResponse } from './auth/dto/auth.dto'
 
 export const AxiosInstance = axios.create({
   baseURL: getEnv().VITE_API_URL,
@@ -8,7 +9,9 @@ export const AxiosInstance = axios.create({
 
 AxiosInstance.interceptors.request.use(
   config => {
-    const { accessToken } = useAuthStore.getState()
+    const state = useAuthStore.getState()
+    const accessToken = state.accessToken
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
@@ -28,21 +31,31 @@ AxiosInstance.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const { refreshToken } = useAuthStore.getState()
+        const state = useAuthStore.getState()
+        const refreshToken = state.refreshToken
+        const accessToken = state.accessToken
 
+        // Valida se refresh token existe
         if (!refreshToken) {
-          throw new Error('No refresh token available')
+          state.logout()
+          return Promise.reject(error)
         }
 
-        const response = await axios.post(
+        // Evita fazer refresh se não há accessToken válido
+        if (!accessToken) {
+          state.logout()
+          return Promise.reject(error)
+        }
+
+        const response = await axios.post<AuthResponse>(
           `${getEnv().VITE_API_URL}/auth/refresh`,
           { refreshToken },
         )
 
-        const { accessToken } = response.data
-        useAuthStore.getState().setTokens(accessToken, refreshToken)
+        const { accessToken: newAccessToken } = response.data
+        state.setTokens(newAccessToken, refreshToken)
 
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
         return AxiosInstance(originalRequest)
       } catch (refreshError) {
         useAuthStore.getState().logout()

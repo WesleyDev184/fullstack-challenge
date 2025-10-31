@@ -1,10 +1,10 @@
 import { getEnv } from '@/utils/env-manager'
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import axios from 'axios'
 import type { HealthResponse } from './dto/health.dto'
 
 export function HealthServiceQuery() {
-  const res = useQuery<HealthResponse>({
+  return queryOptions<HealthResponse>({
     queryKey: ['health'],
     queryFn: async () => {
       const response = await axios.get<HealthResponse>(
@@ -13,6 +13,4 @@ export function HealthServiceQuery() {
       return response.data
     },
   })
-
-  return res
 }

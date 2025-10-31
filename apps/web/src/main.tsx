@@ -1,3 +1,4 @@
+// main.tsx
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
@@ -5,20 +6,23 @@ import ReactDOM from 'react-dom/client'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { ThemeInitializer } from './components/theme-initializer.tsx'
-import { ReactQueryProvider } from './provider/react-query-provider.tsx'
 import reportWebVitals from './reportWebVitals.ts'
 import './styles.css'
 
 // Create a new router instance
+const queryClient = new QueryClient()
+
 const router = createRouter({
   routeTree,
-  context: {},
+  context: {
+    queryClient,
+  },
   defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  scrollRestoration: true,
 })
 
 // Register the router instance for type safety
@@ -30,15 +34,16 @@ declare module '@tanstack/react-router' {
 
 // Render the app
 const rootElement = document.getElementById('app')
+
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
       <NuqsAdapter>
-        <ReactQueryProvider>
+        <QueryClientProvider client={queryClient}>
           <ThemeInitializer />
           <RouterProvider router={router} />
-        </ReactQueryProvider>
+        </QueryClientProvider>
       </NuqsAdapter>
     </StrictMode>,
   )

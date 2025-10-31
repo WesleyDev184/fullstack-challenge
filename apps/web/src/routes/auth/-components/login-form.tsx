@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 export function LoginForm({
   className,
@@ -51,9 +52,7 @@ export function LoginForm({
     try {
       await login(data)
       reset()
-
-      // Navigate sem limpar os estados antes,
-      // pois a navegação vai para outra página
+      toast.success('Login successful!')
       navigate({
         to: '/',
       })

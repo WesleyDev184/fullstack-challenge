@@ -2,12 +2,13 @@ import {
   useLoginMutation,
   useRefreshTokenMutation,
   useRegisterMutation,
-  useUserQuery,
+  UserQuery,
 } from '@/http/auth/auth.query'
 import type { LoginFormData, RegisterFormData } from '@/http/auth/dto/auth.dto'
 import { useAuthStore } from '@/stores/auth-store'
-import { useNavigate } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export const useAuth = () => {
   const accessToken = useAuthStore(state => state.accessToken)
@@ -21,39 +22,34 @@ export const useAuth = () => {
   const loginMutation = useLoginMutation()
   const refreshMutation = useRefreshTokenMutation()
   const registerMutation = useRegisterMutation()
-  const { data: fetchedUser, refetch: refetchUser } = useUserQuery(userId)
 
-  const navigate = useNavigate()
+  // Só ativa a query se userId e accessToken existem
+  const { data: fetchedUser, refetch: refetchUser } = useQuery({
+    ...UserQuery(userId),
+    enabled: !!userId && !!accessToken,
+  })
 
   // Sincroniza o usuário quando for buscado
   useEffect(() => {
     if (fetchedUser) {
       setUser(fetchedUser)
     }
-  }, [fetchedUser, accessToken])
+  }, [fetchedUser])
 
   const login = async (credentials: LoginFormData) => {
     const data = await loginMutation.mutateAsync(credentials)
     setTokens(data.accessToken, data.refreshToken)
 
-    navigate({
-      to: '/',
-    })
     return data
   }
 
   const logout = () => {
+    toast.warning('Logout successful')
     logoutStore()
   }
 
   const register = async (data: RegisterFormData) => {
     await registerMutation.mutateAsync(data)
-    navigate({
-      to: '/auth/login',
-      search: {
-        postRegister: 'true',
-      },
-    })
   }
 
   const refreshAccessToken = async () => {

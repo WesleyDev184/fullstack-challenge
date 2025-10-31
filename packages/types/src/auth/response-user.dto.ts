@@ -29,3 +29,11 @@ export class ResponseUserListDto {
     this.users = users;
   }
 }
+
+export class ResponseUserProfileDto {
+  emails: string[];
+
+  constructor(emails: string[]) {
+    this.emails = emails;
+  }
+}

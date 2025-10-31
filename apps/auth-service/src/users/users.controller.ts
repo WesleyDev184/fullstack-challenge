@@ -19,6 +19,11 @@ export class UsersController {
     return await this.usersService.findAll(payload)
   }
 
+  @MessagePattern('find-emails-by-ids')
+  async findEmailsByIds(@Payload() userIds: string[]) {
+    return await this.usersService.findAllEmails(userIds)
+  }
+
   @MessagePattern('find-user-by-id')
   async findOne(@Payload() id: string) {
     return await this.usersService.findOne(id)

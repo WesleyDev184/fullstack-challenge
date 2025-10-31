@@ -8,17 +8,13 @@ export interface User {
   updatedAt: string
 }
 
-export interface LoginResponse {
+export interface AuthResponse {
   accessToken: string
   refreshToken: string
 }
 
 export interface RefreshRequest {
   refreshToken: string
-}
-
-export interface RefreshResponse {
-  accessToken: string
 }
 
 export const loginSchema = z.object({

@@ -345,6 +345,73 @@ export class AuthController {
     return result
   }
 
+  @Post('users/emails')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({
+    description:
+      'Lista de IDs de usuários para obter os emails correspondentes',
+    schema: {
+      type: 'object',
+      properties: {
+        userIds: {
+          type: 'array',
+          items: { type: 'uuid' },
+          example: [
+            '550e8400-e29b-41d4-a716-446655440000',
+            '660e8400-e29b-41d4-a716-446655440111',
+          ],
+          description: 'Lista de IDs únicos dos usuários',
+        },
+      },
+      required: ['userIds'],
+    },
+  })
+  @ApiOperation({ summary: 'Obter todos os emails de usuários' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de usernames de usuários',
+    schema: {
+      type: 'object',
+      properties: {
+        emails: {
+          type: 'array',
+          items: { type: 'string', example: 'johndoe@example.com' },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Não autorizado',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Não autorizado' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-10-26T07:16:00.803Z',
+        },
+        path: { type: 'string', example: '/api/auth/users' },
+      },
+    },
+  })
+  async getAllEmails(@Body('userIds') userIds: string[]) {
+    const result = await lastValueFrom(
+      this.authService.send('find-emails-by-ids', userIds).pipe(
+        catchError(error => {
+          return throwError(
+            () => new HttpException(error.message, error.status),
+          )
+        }),
+      ),
+    )
+
+    return result
+  }
+
   @Get('users/:id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

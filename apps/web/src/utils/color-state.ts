@@ -19,14 +19,14 @@ export function ColorStatus(status: TaskStatusEnum): string {
 export function ColorPriority(priority: TaskPriorityEnum): string {
   switch (priority) {
     case TaskPriorityEnum.LOW:
-      return 'bg-emerald-500'
+      return 'bg-emerald-200 text-emerald-700'
     case TaskPriorityEnum.MEDIUM:
-      return 'bg-yellow-500'
+      return 'bg-yellow-200 text-yellow-700'
     case TaskPriorityEnum.HIGH:
-      return 'bg-destructive'
+      return 'bg-red-200 text-red-700'
     case TaskPriorityEnum.URGENT:
-      return 'bg-purple-500'
+      return 'bg-purple-200 text-purple-700'
     default:
-      return 'bg-gray-500'
+      return 'bg-gray-200'
   }
 }

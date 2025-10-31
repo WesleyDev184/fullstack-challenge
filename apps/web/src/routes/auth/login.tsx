@@ -22,7 +22,6 @@ function Login() {
   const { isAuthenticated } = useAuth()
 
   if (isAuthenticated) {
-    console.log('User already authenticated, redirecting to home page')
     return <Navigate to='/' />
   }
 
