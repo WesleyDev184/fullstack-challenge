@@ -14,11 +14,6 @@ import { TaskPriorityEnum } from "./enums/task-priority.enum";
 import { TaskStatusEnum } from "./enums/task-status.enum";
 
 export class UpdateTaskDto {
-  @IsString()
-  @IsOptional()
-  @IsUUID()
-  id?: string;
-
   @IsOptional()
   @IsString()
   @MinLength(3)
@@ -51,7 +46,6 @@ export class UpdateTaskDto {
   assigneeIds?: string[];
 
   constructor(
-    id?: string,
     title?: string,
     description?: string,
     dueAt?: Date,
@@ -59,7 +53,6 @@ export class UpdateTaskDto {
     status?: TaskStatusEnum,
     assigneeIds?: string[]
   ) {
-    this.id = id;
     this.title = title;
     this.description = description;
     this.dueAt = dueAt;

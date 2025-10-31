@@ -74,7 +74,18 @@ export function BoardCard({ task }: BoardCardProps) {
         </Link>
       </ContextMenuTrigger>
       <ContextMenuContent className='w-52'>
-        <ContextMenuItem inset>Back</ContextMenuItem>
+        <ContextMenuItem inset asChild>
+          <Link
+            to={'/task/$taskId'}
+            params={{ taskId: task.id }}
+            search={{
+              editTaskOpen: 'true',
+            }}
+            className='text-yellow-500'
+          >
+            Editar
+          </Link>
+        </ContextMenuItem>
 
         <ContextMenuItem inset asChild>
           <button

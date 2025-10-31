@@ -6,7 +6,7 @@ import {
 import { toast } from 'sonner'
 import { AxiosInstance } from '../axios-instance'
 import type { PaginatedResponseDto, PaginationDto } from '../generics'
-import type { Task } from './dto/task-dto'
+import type { Task, UpdateTaskDto } from './dto/task-dto'
 
 export function TasksQuery(pagination: PaginationDto) {
   return queryOptions<PaginatedResponseDto<Task>>({
@@ -50,6 +50,28 @@ export function useDeleteTaskMutation() {
       })
 
       toast.success('Tarefa deletada com sucesso!')
+    },
+  })
+}
+
+// atualiza a task
+export function useUpdateTaskMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { id: string; data: UpdateTaskDto }>({
+    mutationFn: async ({ id, data }) => {
+      await AxiosInstance.patch(`/tasks/${id}`, data)
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['task', id],
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ['tasks'],
+      })
+
+      toast.success('Tarefa atualizada com sucesso!')
     },
   })
 }

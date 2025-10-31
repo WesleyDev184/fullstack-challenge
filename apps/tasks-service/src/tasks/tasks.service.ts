@@ -116,6 +116,22 @@ export class TasksService {
       relations: ['assignees', 'comments', 'history'],
     })
 
+    // Ordenar cada relation para que o mais recente fique no topo
+    if (task) {
+      if (task.comments?.length) {
+        task.comments.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+      }
+      if (task.history?.length) {
+        task.history.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+      }
+    }
+
     if (!task) {
       throw new HttpException(`Task with ID ${id} not found`, 404)
     }
@@ -201,10 +217,15 @@ export class TasksService {
         task.status = updateTaskDto.status
       }
 
+      if (updateTaskDto.content !== undefined) {
+        changes.content = { updated: true }
+        task.content = updateTaskDto.content
+      }
+
       await manager.save(task)
 
       // Atualizar assignees
-      if (assigneeIds !== undefined) {
+      if (assigneeIds !== undefined && assigneeIds.length > 0) {
         await this.taskAssigneeService.updateAssigneesWithManager(
           manager,
           id,

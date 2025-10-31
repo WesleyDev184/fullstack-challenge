@@ -1,10 +1,14 @@
-export interface TaskAssigneeDto {
+import { z } from 'zod'
+import { TaskPriorityEnum } from '../enums/task-priority.enum'
+import { TaskStatusEnum } from '../enums/task-status.enum'
+
+export type TaskAssigneeDto = {
   taskId: string
   userId: string
   assignedAt: Date
 }
 
-export interface TaskCommentDto {
+export type TaskCommentDto = {
   id: string
   taskId: string
   authorId: string
@@ -12,7 +16,7 @@ export interface TaskCommentDto {
   createdAt: Date
 }
 
-export interface TaskHistoryDto {
+export type TaskHistoryDto = {
   id: string
   taskId: string
   actorId: string
@@ -21,7 +25,7 @@ export interface TaskHistoryDto {
   createdAt: Date
 }
 
-export interface Task {
+export type Task = {
   id: string
   title: string
   description: string
@@ -36,3 +40,15 @@ export interface Task {
   comments: TaskCommentDto[]
   history: TaskHistoryDto[]
 }
+
+export const updateTaskDtoSchema = z.object({
+  title: z.string().min(3).optional(),
+  content: z.string().optional(),
+  description: z.string().optional(),
+  dueAt: z.date().optional(),
+  priority: z.nativeEnum(TaskPriorityEnum).optional(),
+  status: z.nativeEnum(TaskStatusEnum).optional(),
+  assigneeIds: z.array(z.string().uuid()).optional(),
+})
+
+export type UpdateTaskDto = z.infer<typeof updateTaskDtoSchema>

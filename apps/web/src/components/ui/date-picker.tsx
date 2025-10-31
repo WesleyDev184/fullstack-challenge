@@ -14,6 +14,7 @@ import {
 
 interface DatePickerProps {
   prefix?: string
+  label?: string
 }
 
 export function DatePicker(props: DatePickerProps) {
@@ -35,16 +36,16 @@ export function DatePicker(props: DatePickerProps) {
   )
 
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex flex-col gap-3 w-full'>
       <Label htmlFor='date' className='px-1'>
-        Date of birth
+        {props.label ?? 'Due Date'}
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
             id='date'
-            className='w-48 justify-between font-normal'
+            className='justify-between font-normal w-full'
           >
             {date ? date.toLocaleDateString() : 'Select date'}
             <ChevronDownIcon />

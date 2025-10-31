@@ -1,8 +1,10 @@
 import { useTheme } from '@/hooks/use-theme'
 import { BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core'
 import { BlockNoteView } from '@blocknote/mantine'
-import { useCreateBlockNote } from '@blocknote/react'
-import { useEffect } from 'react'
+import { useCreateBlockNote, useEditorChange } from '@blocknote/react'
+import { useEffect, useState } from 'react'
+
+const AUTOSAVE_INTERVAL = 60 * 1000 // 60 seconds
 
 type TaskEditorProps = {
   content?: string
@@ -11,6 +13,7 @@ type TaskEditorProps = {
 
 export function TaskEditor({ content, title }: TaskEditorProps) {
   const { theme } = useTheme()
+  const [markdown, setMarkdown] = useState<string>('')
 
   const { audio, image, video, file, ...remainingBlockSpecs } =
     defaultBlockSpecs
@@ -30,6 +33,12 @@ export function TaskEditor({ content, title }: TaskEditorProps) {
       headers: true,
     },
   })
+
+  useEditorChange(editor => {
+    const markdown = editor.blocksToMarkdownLossy(editor.document)
+    console.log(markdown)
+    setMarkdown(markdown)
+  }, editor)
 
   useEffect(() => {
     function loadInitialHTML() {

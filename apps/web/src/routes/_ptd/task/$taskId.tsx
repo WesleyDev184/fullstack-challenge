@@ -6,6 +6,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { CommentsSection } from './-components/comments-section'
+import { EditTaskDialog } from './-components/edit-task-dialog'
 import { RecentHistory } from './-components/recent-history'
 import { TaskEditor } from './-components/task-editor'
 import { TaskInformation } from './-components/task-information'
@@ -42,8 +43,9 @@ function RouteComponent() {
   return (
     <Suspense fallback={<div className='p-6'>Loading...</div>}>
       <div className='h-full flex flex-col bg-background'>
-        <div className='border-b px-6 py-4 shrink-0'>
+        <div className='border-b px-6 py-4 shrink-0 flex items-center justify-between'>
           <h1 className='text-3xl font-bold'>{task.title}</h1>
+          <EditTaskDialog task={task} />
         </div>
 
         {/* Main Content Grid */}

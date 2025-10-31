@@ -1,6 +1,9 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { EmailsQuery } from '@/http/auth/auth.query'
 import type { Task } from '@/http/task/dto/task-dto'
+import { TaskPriorityEnum } from '@/http/task/enums/task-priority.enum'
+import { TaskStatusEnum } from '@/http/task/enums/task-status.enum'
+import { ColorPriority, ColorStatus } from '@/utils/color-state'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 type TaskInformationProps = {
@@ -10,6 +13,20 @@ type TaskInformationProps = {
 export function TaskInformation({ task }: TaskInformationProps) {
   const assigneesIds = [...task?.assignees.map(assignee => assignee.userId)]
   const { data: emailMap } = useSuspenseQuery(EmailsQuery(assigneesIds))
+
+  const PRIORITY_LABELS: Record<TaskPriorityEnum, string> = {
+    [TaskPriorityEnum.LOW]: 'Baixa',
+    [TaskPriorityEnum.MEDIUM]: 'Média',
+    [TaskPriorityEnum.HIGH]: 'Alta',
+    [TaskPriorityEnum.URGENT]: 'Urgente',
+  }
+
+  const STATUS_LABELS: Record<TaskStatusEnum, string> = {
+    [TaskStatusEnum.TODO]: 'A FAZER',
+    [TaskStatusEnum.IN_PROGRESS]: 'EM ANDAMENTO',
+    [TaskStatusEnum.REVIEW]: 'REVISÃO',
+    [TaskStatusEnum.DONE]: 'CONCLUÍDO',
+  }
 
   return (
     <div className='col-span-1 overflow-hidden bg-muted'>
@@ -23,8 +40,12 @@ export function TaskInformation({ task }: TaskInformationProps) {
         {/* Status */}
         <div>
           <h3 className='font-semibold mb-2'>Status</h3>
-          <div className='inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium'>
-            {task.status}
+          <div
+            className={`text-sm w-max px-2 py-0.5 rounded-md font-medium ${ColorStatus(
+              task.status as TaskStatusEnum,
+            )}`}
+          >
+            {STATUS_LABELS[task.status as TaskStatusEnum]}
           </div>
         </div>
 
@@ -32,15 +53,11 @@ export function TaskInformation({ task }: TaskInformationProps) {
         <div>
           <h3 className='font-semibold mb-2'>Priority</h3>
           <div
-            className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-              task.priority === 'HIGH'
-                ? 'bg-red-100 text-red-800'
-                : task.priority === 'MEDIUM'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-green-100 text-green-800'
-            }`}
+            className={`text-sm w-max px-2 py-0.5 rounded-md font-medium ${ColorPriority(
+              task.priority as TaskPriorityEnum,
+            )}`}
           >
-            {task.priority}
+            {PRIORITY_LABELS[task.priority as TaskPriorityEnum]}
           </div>
         </div>
 
@@ -94,7 +111,13 @@ export function TaskInformation({ task }: TaskInformationProps) {
         <div>
           <h3 className='font-semibold mb-2'>Created</h3>
           <p className='text-sm text-muted-foreground'>
-            {new Date(task.createdAt).toLocaleDateString('pt-BR')}
+            {new Date(task.createdAt).toLocaleDateString('pt-BR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </p>
         </div>
 
@@ -102,7 +125,13 @@ export function TaskInformation({ task }: TaskInformationProps) {
         <div>
           <h3 className='font-semibold mb-2'>Updated</h3>
           <p className='text-sm text-muted-foreground'>
-            {new Date(task.updatedAt).toLocaleDateString('pt-BR')}
+            {new Date(task.updatedAt).toLocaleDateString('pt-BR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </p>
         </div>
       </div>

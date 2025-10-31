@@ -28,7 +28,7 @@ export class NotificationSubscriber
     const data = event.entity
     data.assigneeIds.forEach(assigneeId => {
       const { assigneeIds, ...rest } = data
-      this.notificationGateway.server.emit(`notification.${assigneeId}`, rest)
+      this.notificationGateway.server.emit(`notification`, rest)
     })
   }
 }
