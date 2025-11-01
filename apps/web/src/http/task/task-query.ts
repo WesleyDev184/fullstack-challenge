@@ -70,8 +70,6 @@ export function useUpdateTaskMutation() {
       queryClient.invalidateQueries({
         queryKey: ['tasks'],
       })
-
-      toast.success('Tarefa atualizada com sucesso!')
     },
   })
 }

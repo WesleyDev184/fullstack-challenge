@@ -218,7 +218,6 @@ export class TasksService {
       }
 
       if (updateTaskDto.content !== undefined) {
-        changes.content = { updated: true }
         task.content = updateTaskDto.content
       }
 
@@ -245,17 +244,19 @@ export class TasksService {
         )
       }
 
-      // Publicar evento (fora da transação)
-      this.notificationsClient.emit(
-        'create.notification',
-        new CreateNotificationDto(
-          'Task Updated',
-          task.id,
-          `The task "${task.title}" has been updated.`,
-          NotificationCategoryEnum.ASSIGNMENT,
-          assigneeIds ? [userId, ...assigneeIds] : [],
-        ),
-      )
+      if (updateTaskDto.content === undefined) {
+        // Publicar evento (fora da transação)
+        this.notificationsClient.emit(
+          'create.notification',
+          new CreateNotificationDto(
+            'Task Updated',
+            task.id,
+            `The task "${task.title}" has been updated.`,
+            NotificationCategoryEnum.ASSIGNMENT,
+            assigneeIds ? [userId, ...assigneeIds] : [],
+          ),
+        )
+      }
 
       return task
     })

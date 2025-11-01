@@ -25,7 +25,7 @@ export class Task {
   @Column('text', { nullable: true })
   description: string
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'text', nullable: true })
   content: string
 
   @Index('IDX_task_due_at', ['dueAt'])

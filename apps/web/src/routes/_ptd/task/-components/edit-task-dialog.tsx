@@ -153,6 +153,7 @@ export function EditTaskDialog({ task, children }: EditTaskDialogProps) {
         id: task.id,
         data: changedFields as UpdateTaskDto,
       })
+      toast.success('Tarefa atualizada com sucesso!')
       await setDueDateQuery(null)
       await setOpen(false)
     } catch (error) {
